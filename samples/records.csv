@@ -1,0 +1,8 @@
+region,quarter,inspection_id,pressure_pa
+east,1,E-inlet,0
+west,2,W-inlet,1250
+west,3,W-inlet,1250
+east,2,E-sluice,775
+west,2,W-outlet,
+east,1,E-outlet,-250
+west,3,W-outlet,

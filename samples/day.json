@@ -1,0 +1,21 @@
+{
+  "portal_id": "river-gate",
+  "initial": {"region": "east", "quarter": 1},
+  "jobs": [
+    {
+      "order_id": "night-02", "region": "east", "quarter": 1,
+      "shift": "2026-11-21/night", "position": 2, "export_id": "day-east-01",
+      "first": "evidence", "events": [["render"]]
+    },
+    {
+      "order_id": "night-01", "region": "west", "quarter": 2,
+      "shift": "2026-11-21/night", "position": 1, "export_id": "day-west-02",
+      "first": "file", "events": [["edit", "region", "west"], ["render"]]
+    },
+    {
+      "order_id": "night-03", "region": "west", "quarter": 2,
+      "shift": "2026-11-21/night", "position": 3, "export_id": "day-west-drift",
+      "first": "file", "events": [["edit", "quarter", 3], ["render"], ["edit", "quarter", 2]]
+    }
+  ]
+}
