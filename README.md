@@ -27,7 +27,9 @@ python3 -B -m archive.run demo --workspace workspace
 - `portal.render.Portal(portal_id, records, region, quarter)` 启动一次本地门户会话。`portal.view.edit_filter(portal.view, field, value, actor, expected_version=None)` 修改单项并返回 `FilterPosition`。同值改选也推进版本。非法参数抛出 `ValueError`，预期版本不一致抛出 `VersionConflict`。`read_filter(portal.view, field)` 读取该项最新写入。
 - `request_export(portal, export_id)` 受理请求，`render_export(portal, export_id)` 按实际渲染时的视图固定文件，`render_download(portal, export_id)` 取回原字节及实渲染锚点，未渲染返回 `None`。未知、关闭、重复渲染和不可取得由 `PortalError.code` 区分。每次新渲染使用该门户下全新的导出号。
 - `capture.orders.make_order(order_id, portal_id, region, quarter, shift, position)` 建立固定工单。班次采用 `YYYY-MM-DD/day` 或 `YYYY-MM-DD/night`，同班位置是唯一的正整数。工单、门户和导出标识使用 1 到 96 个字母、数字、点、下划线或连字符，首位是字母或数字。
-- `capture.collect.collect_order(spool, portal, order, export_id, drive=None, *, before_restore=None)` 执行暂借及取件。`drive` 是录制事件的驱动函数，接收门户和导出号，省略时直接实际渲染。`before_restore` 可在条件归还前插入录制的人工改选。成功返回 `ready` 及 `Delivery`，失败返回 `failed` 及原因。退出时处理所有已成功暂写的项。同值人工接手与归还间的人工改选均保留。`capture.spool.load_delivery(spool, portal_id, export_id)` 可在关停后重读原件和依据。已经保全的同号同工单材料沿原绑定返回。
+- `capture.collect.collect_order(spool, portal, order, export_id, drive=None, *, before_restore=None, borrow_id=None, send_edit=None)` 执行暂借及取件。`drive` 是录制事件的驱动函数，接收门户和导出号，省略时直接实际渲染。`before_restore` 可在条件归还前插入录制的人工改选。成功返回 `ready` 及 `Delivery`，失败返回 `failed` 及原因。退出时处理所有已成功暂写的项。`capture.spool.load_delivery(spool, portal_id, export_id)` 可在关停后重读原件和依据。已经保全的同号同工单材料沿原绑定返回。
+- 给出 `borrow_id` 时，采录成为可续办的暂借：每条筛选命令发送前，前值与写入意图先持久到采录库的 `capture_borrows` 与 `capture_borrow_items`。同一门户视图存在未结暂借时，新采录返回 `CollectResult(status='busy', delivery=None)`，且不消耗本次暂借号；值班员仍可经门户改选。`send_edit(phase, field, execute)` 默认为直接执行 `execute()`，可配合 `portal.wire.ScriptedLink` 模拟断联；`CaptureLinkLost` 从入口原样传出，失联调用不清理也不公布结清。
+- `capture.collect.recover_borrow(spool, portal, borrow_id, *, send_edit=None)` 在重开采录库后续办，返回 `settled`、`busy` 或 `unknown`。结清只归还实际由该次暂借最后写入的筛选项：人工同值重选、从未执行的借写和已完成的归还都保留原状。已结号在原会话内重查为 `settled`，新门户会话或未知号为 `unknown`，暂不能确认（例如归还再次断联或持续版本冲突）为 `busy`。结清后旧尝试的滞留或重复命令由会话台账拒绝（`BORROW_SETTLED`），筛选值、写入者与版本均不变。已保全原件按原导出号、已签档案按原成果号继续领取。
 
 ## 实收、换算与复领
 

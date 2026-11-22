@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 from typing import Iterable
 
 from portal.events import PortalError, PortalEventLog
+from portal.ledger import BorrowLedger
 from portal.records import InspectionRecord, require_identifier, select_records
 from portal.view import PortalView, read_filter, validate_scope
 
@@ -28,6 +29,7 @@ class Portal:
         self.records = tuple(records)
         self.events = PortalEventLog(portal_id, region, quarter)
         self.view = PortalView(self.events)
+        self.ledger = BorrowLedger()
         self._exports: dict[str, ExportInstance] = {}
 
     def _export(self, export_id: str) -> ExportInstance:
